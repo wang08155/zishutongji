@@ -168,4 +168,64 @@ document.addEventListener('DOMContentLoaded', () => {
     if (themeToggle) {
         themeToggle.addEventListener('click', toggleTheme);
     }
+
+    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+    const nav = document.querySelector('nav');
+    
+    if (mobileMenuBtn && nav) {
+        mobileMenuBtn.addEventListener('click', () => {
+            nav.classList.toggle('active');
+            mobileMenuBtn.textContent = nav.classList.contains('active') ? '✕' : '☰';
+        });
+    }
+
+    document.addEventListener('click', (e) => {
+        if (nav && !nav.contains(e.target) && !mobileMenuBtn?.contains(e.target)) {
+            nav.classList.remove('active');
+            if (mobileMenuBtn) {
+                mobileMenuBtn.textContent = '☰';
+            }
+        }
+    });
+
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            if (nav) {
+                nav.classList.remove('active');
+            }
+            if (mobileMenuBtn) {
+                mobileMenuBtn.textContent = '☰';
+            }
+        });
+    });
+
+    const textInput = document.getElementById('textInput');
+    const sampleBtn = document.getElementById('sampleBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const copyBtn = document.getElementById('copyBtn');
+
+    if (sampleBtn && textInput && !sampleBtn.dataset.bound) {
+        sampleBtn.dataset.bound = 'true';
+        sampleBtn.addEventListener('click', () => {
+            textInput.value = SAMPLE_TEXT;
+            textInput.dispatchEvent(new Event('input'));
+        });
+    }
+
+    if (clearBtn && textInput && !clearBtn.dataset.bound) {
+        clearBtn.dataset.bound = 'true';
+        clearBtn.addEventListener('click', () => {
+            textInput.value = '';
+            textInput.dispatchEvent(new Event('input'));
+        });
+    }
+
+    if (copyBtn && textInput && !copyBtn.dataset.bound) {
+        copyBtn.dataset.bound = 'true';
+        copyBtn.addEventListener('click', async () => {
+            const success = await copyToClipboard(textInput.value);
+            showCopyFeedback(copyBtn, success);
+        });
+    }
 });
