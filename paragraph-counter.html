@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Free Paragraph Counter - Count paragraphs in your text online. Split by double line breaks for accurate paragraph counting.">
+    <meta name="keywords" content="paragraph counter, paragraph count, count paragraphs, text analyzer, free online tool">
+    <meta name="author" content="Word Counter Tool">
+    <title>Free Paragraph Counter - Count Paragraphs Online</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">📝</span>
+                Word Counter
+            </a>
+            <nav>
+                <a href="index.html" class="nav-link">Word Counter</a>
+                <a href="character-counter.html" class="nav-link">Character Counter</a>
+                <a href="sentence-counter.html" class="nav-link">Sentence Counter</a>
+                <a href="paragraph-counter.html" class="nav-link active">Paragraph Counter</a>
+                <a href="keyword-density.html" class="nav-link">Keyword Density</a>
+            </nav>
+            <button class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Paragraph Counter</h1>
+            <p>Count paragraphs separated by double line breaks</p>
+        </section>
+
+        <div class="tool-container">
+            <textarea id="textInput" placeholder="Paste or type your text here to count paragraphs..."></textarea>
+            
+            <div class="button-group">
+                <button class="btn btn-primary" id="copyBtn">📋 Copy</button>
+                <button class="btn btn-secondary" id="clearBtn">🗑️ Clear</button>
+                <button class="btn btn-secondary" id="sampleBtn">📄 Sample</button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="paragraphCount">0</div>
+                    <div class="stat-label">Paragraphs</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="sentenceCount">0</div>
+                    <div class="stat-label">Sentences</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="wordCount">0</div>
+                    <div class="stat-label">Words</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avgWordsParagraph">0</div>
+                    <div class="stat-label">Avg Words/Para</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avgSentencesParagraph">0</div>
+                    <div class="stat-label">Avg Sentences/Para</div>
+                </div>
+            </div>
+
+            <div class="keywords-section">
+                <h3>📄 Paragraph Breakdown</h3>
+                <div id="paragraphList" class="keywords-list">
+                    <div class="no-results">Enter text to see paragraph breakdown</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="privacy-notice">
+            <strong>🔒 Your Privacy Matters:</strong> All text processing happens locally in your browser. 
+            No data is sent to any server. Your text never leaves your device.
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>Tools</h4>
+                <ul>
+                    <li><a href="index.html">Word Counter</a></li>
+                    <li><a href="character-counter.html">Character Counter</a></li>
+                    <li><a href="sentence-counter.html">Sentence Counter</a></li>
+                    <li><a href="paragraph-counter.html">Paragraph Counter</a></li>
+                    <li><a href="keyword-density.html">Keyword Density</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>About</h4>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Contact</h4>
+                <ul>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">Feedback</a></li>
+                    <li><a href="#">Report Bug</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Word Counter Tool. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        const textInput = document.getElementById('textInput');
+        const copyBtn = document.getElementById('copyBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const sampleBtn = document.getElementById('sampleBtn');
+
+        function updateStats() {
+            const text = textInput.value;
+            const paragraphs = countParagraphs(text);
+            const sentences = countSentences(text);
+            const words = countWords(text);
+            const avgWords = paragraphs > 0 ? (words / paragraphs).toFixed(1) : 0;
+            const avgSentences = paragraphs > 0 ? (sentences / paragraphs).toFixed(1) : 0;
+            
+            document.getElementById('paragraphCount').textContent = paragraphs;
+            document.getElementById('sentenceCount').textContent = sentences;
+            document.getElementById('wordCount').textContent = words;
+            document.getElementById('avgWordsParagraph').textContent = avgWords;
+            document.getElementById('avgSentencesParagraph').textContent = avgSentences;
+            
+            updateParagraphList(text);
+        }
+
+        function updateParagraphList(text) {
+            const paragraphList = document.getElementById('paragraphList');
+            const trimmed = text.trim();
+            
+            if (!trimmed) {
+                paragraphList.innerHTML = '<div class="no-results">Enter text to see paragraph breakdown</div>';
+                return;
+            }
+            
+            const paragraphs = trimmed.split(/\n\s*\n/).filter(p => p.trim().length > 0);
+            
+            if (paragraphs.length === 0) {
+                paragraphList.innerHTML = '<div class="no-results">No paragraphs found</div>';
+                return;
+            }
+            
+            paragraphList.innerHTML = paragraphs.map((paragraph, index) => {
+                const wordCount = countWords(paragraph);
+                const sentenceCount = countSentences(paragraph);
+                const preview = paragraph.trim().substring(0, 60).replace(/\n/g, ' ');
+                return `<div class="keyword-item">
+                    <strong>#${index + 1}</strong> 
+                    ${preview}${paragraph.trim().length > 60 ? '...' : ''} 
+                    <span>(${wordCount} words, ${sentenceCount} sentences)</span>
+                </div>`;
+            }).join('');
+        }
+
+        textInput.addEventListener('input', updateStats);
+
+        copyBtn.addEventListener('click', async () => {
+            const success = await copyToClipboard(textInput.value);
+            showCopyFeedback(copyBtn, success);
+        });
+
+        clearBtn.addEventListener('click', () => {
+            textInput.value = '';
+            updateStats();
+        });
+
+        sampleBtn.addEventListener('click', () => {
+            textInput.value = SAMPLE_TEXT;
+            updateStats();
+        });
+
+        updateStats();
+    </script>
+</body>
+</html>

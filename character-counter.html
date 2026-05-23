@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Free Character Counter - Count characters, letters, numbers, spaces, and punctuation online. Detailed character breakdown for your text.">
+    <meta name="keywords" content="character counter, character count, letter count, text analyzer, free online tool, character breakdown">
+    <meta name="author" content="Word Counter Tool">
+    <title>Free Character Counter - Count Characters Online</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">📝</span>
+                Word Counter
+            </a>
+            <nav>
+                <a href="index.html" class="nav-link">Word Counter</a>
+                <a href="character-counter.html" class="nav-link active">Character Counter</a>
+                <a href="sentence-counter.html" class="nav-link">Sentence Counter</a>
+                <a href="paragraph-counter.html" class="nav-link">Paragraph Counter</a>
+                <a href="keyword-density.html" class="nav-link">Keyword Density</a>
+            </nav>
+            <button class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Character Counter</h1>
+            <p>Detailed character analysis with breakdown by type</p>
+        </section>
+
+        <div class="tool-container">
+            <textarea id="textInput" placeholder="Paste or type your text here to see detailed character breakdown..."></textarea>
+            
+            <div class="button-group">
+                <button class="btn btn-primary" id="copyBtn">📋 Copy</button>
+                <button class="btn btn-secondary" id="clearBtn">🗑️ Clear</button>
+                <button class="btn btn-secondary" id="sampleBtn">📄 Sample</button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalChars">0</div>
+                    <div class="stat-label">Total Characters</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="charsNoSpace">0</div>
+                    <div class="stat-label">Without Spaces</div>
+                </div>
+            </div>
+
+            <div class="character-breakdown">
+                <h3>📊 Character Breakdown</h3>
+                <div class="breakdown-grid">
+                    <div class="breakdown-item">
+                        <div class="breakdown-value" id="letters">0</div>
+                        <div class="breakdown-label">Letters (A-Z)</div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="breakdown-value" id="numbers">0</div>
+                        <div class="breakdown-label">Numbers (0-9)</div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="breakdown-value" id="spaces">0</div>
+                        <div class="breakdown-label">Spaces</div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="breakdown-value" id="punctuation">0</div>
+                        <div class="breakdown-label">Punctuation</div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="breakdown-value" id="special">0</div>
+                        <div class="breakdown-label">Special Chars</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="social-warnings">
+                <h4>📱 Social Media Limits</h4>
+                <div class="warning-item">
+                    <span>Twitter (280 chars)</span>
+                    <span class="warning-status status-ok" id="twitterStatus">OK</span>
+                </div>
+                <div class="warning-item">
+                    <span>LinkedIn (210 chars)</span>
+                    <span class="warning-status status-ok" id="linkedinStatus">OK</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="privacy-notice">
+            <strong>🔒 Your Privacy Matters:</strong> All text processing happens locally in your browser. 
+            No data is sent to any server. Your text never leaves your device.
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>Tools</h4>
+                <ul>
+                    <li><a href="index.html">Word Counter</a></li>
+                    <li><a href="character-counter.html">Character Counter</a></li>
+                    <li><a href="sentence-counter.html">Sentence Counter</a></li>
+                    <li><a href="paragraph-counter.html">Paragraph Counter</a></li>
+                    <li><a href="keyword-density.html">Keyword Density</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>About</h4>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Contact</h4>
+                <ul>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">Feedback</a></li>
+                    <li><a href="#">Report Bug</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Word Counter Tool. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        const textInput = document.getElementById('textInput');
+        const copyBtn = document.getElementById('copyBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const sampleBtn = document.getElementById('sampleBtn');
+
+        function updateStats() {
+            const text = textInput.value;
+            const totalChars = countCharacters(text, true);
+            const charsNoSpace = countCharacters(text, false);
+            const breakdown = getCharacterBreakdown(text);
+            
+            document.getElementById('totalChars').textContent = totalChars;
+            document.getElementById('charsNoSpace').textContent = charsNoSpace;
+            document.getElementById('letters').textContent = breakdown.letters;
+            document.getElementById('numbers').textContent = breakdown.numbers;
+            document.getElementById('spaces').textContent = breakdown.spaces;
+            document.getElementById('punctuation').textContent = breakdown.punctuation;
+            document.getElementById('special').textContent = breakdown.special;
+            
+            updateSocialWarnings(totalChars);
+        }
+
+        function updateSocialWarnings(charCount) {
+            const twitterStatus = document.getElementById('twitterStatus');
+            const linkedinStatus = document.getElementById('linkedinStatus');
+            
+            if (charCount <= 280) {
+                twitterStatus.textContent = `✓ ${280 - charCount} left`;
+                twitterStatus.className = 'warning-status status-ok';
+            } else {
+                twitterStatus.textContent = `✗ ${charCount - 280} over`;
+                twitterStatus.className = 'warning-status status-error';
+            }
+            
+            if (charCount <= 210) {
+                linkedinStatus.textContent = `✓ ${210 - charCount} left`;
+                linkedinStatus.className = 'warning-status status-ok';
+            } else {
+                linkedinStatus.textContent = `✗ ${charCount - 210} over`;
+                linkedinStatus.className = 'warning-status status-error';
+            }
+        }
+
+        textInput.addEventListener('input', updateStats);
+
+        copyBtn.addEventListener('click', async () => {
+            const success = await copyToClipboard(textInput.value);
+            showCopyFeedback(copyBtn, success);
+        });
+
+        clearBtn.addEventListener('click', () => {
+            textInput.value = '';
+            updateStats();
+        });
+
+        sampleBtn.addEventListener('click', () => {
+            textInput.value = SAMPLE_TEXT;
+            updateStats();
+        });
+
+        updateStats();
+    </script>
+</body>
+</html>

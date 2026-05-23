@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Free Sentence Counter - Count sentences in your text online. Split by periods, exclamation marks, and question marks.">
+    <meta name="keywords" content="sentence counter, sentence count, text analyzer, count sentences, free online tool">
+    <meta name="author" content="Word Counter Tool">
+    <title>Free Sentence Counter - Count Sentences Online</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">📝</span>
+                Word Counter
+            </a>
+            <nav>
+                <a href="index.html" class="nav-link">Word Counter</a>
+                <a href="character-counter.html" class="nav-link">Character Counter</a>
+                <a href="sentence-counter.html" class="nav-link active">Sentence Counter</a>
+                <a href="paragraph-counter.html" class="nav-link">Paragraph Counter</a>
+                <a href="keyword-density.html" class="nav-link">Keyword Density</a>
+            </nav>
+            <button class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Sentence Counter</h1>
+            <p>Count sentences split by periods, exclamation marks, and question marks</p>
+        </section>
+
+        <div class="tool-container">
+            <textarea id="textInput" placeholder="Paste or type your text here to count sentences..."></textarea>
+            
+            <div class="button-group">
+                <button class="btn btn-primary" id="copyBtn">📋 Copy</button>
+                <button class="btn btn-secondary" id="clearBtn">🗑️ Clear</button>
+                <button class="btn btn-secondary" id="sampleBtn">📄 Sample</button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="sentenceCount">0</div>
+                    <div class="stat-label">Sentences</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="wordCount">0</div>
+                    <div class="stat-label">Words</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avgWordsSentence">0</div>
+                    <div class="stat-label">Avg Words/Sentence</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="charCount">0</div>
+                    <div class="stat-label">Characters</div>
+                </div>
+            </div>
+
+            <div class="keywords-section">
+                <h3>📝 Sentence Breakdown</h3>
+                <div id="sentenceList" class="keywords-list">
+                    <div class="no-results">Enter text to see sentence breakdown</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="privacy-notice">
+            <strong>🔒 Your Privacy Matters:</strong> All text processing happens locally in your browser. 
+            No data is sent to any server. Your text never leaves your device.
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>Tools</h4>
+                <ul>
+                    <li><a href="index.html">Word Counter</a></li>
+                    <li><a href="character-counter.html">Character Counter</a></li>
+                    <li><a href="sentence-counter.html">Sentence Counter</a></li>
+                    <li><a href="paragraph-counter.html">Paragraph Counter</a></li>
+                    <li><a href="keyword-density.html">Keyword Density</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>About</h4>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Contact</h4>
+                <ul>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">Feedback</a></li>
+                    <li><a href="#">Report Bug</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Word Counter Tool. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        const textInput = document.getElementById('textInput');
+        const copyBtn = document.getElementById('copyBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const sampleBtn = document.getElementById('sampleBtn');
+
+        function updateStats() {
+            const text = textInput.value;
+            const sentences = countSentences(text);
+            const words = countWords(text);
+            const chars = countCharacters(text, true);
+            const avgWords = sentences > 0 ? (words / sentences).toFixed(1) : 0;
+            
+            document.getElementById('sentenceCount').textContent = sentences;
+            document.getElementById('wordCount').textContent = words;
+            document.getElementById('avgWordsSentence').textContent = avgWords;
+            document.getElementById('charCount').textContent = chars;
+            
+            updateSentenceList(text);
+        }
+
+        function updateSentenceList(text) {
+            const sentenceList = document.getElementById('sentenceList');
+            const trimmed = text.trim();
+            
+            if (!trimmed) {
+                sentenceList.innerHTML = '<div class="no-results">Enter text to see sentence breakdown</div>';
+                return;
+            }
+            
+            const sentences = trimmed.split(/[.!?]+/).filter(s => s.trim().length > 0);
+            
+            if (sentences.length === 0) {
+                sentenceList.innerHTML = '<div class="no-results">No sentences found</div>';
+                return;
+            }
+            
+            sentenceList.innerHTML = sentences.map((sentence, index) => {
+                const wordCount = countWords(sentence);
+                return `<div class="keyword-item">
+                    <strong>#${index + 1}</strong> 
+                    ${sentence.trim().substring(0, 50)}${sentence.trim().length > 50 ? '...' : ''} 
+                    <span>(${wordCount} words)</span>
+                </div>`;
+            }).join('');
+        }
+
+        textInput.addEventListener('input', updateStats);
+
+        copyBtn.addEventListener('click', async () => {
+            const success = await copyToClipboard(textInput.value);
+            showCopyFeedback(copyBtn, success);
+        });
+
+        clearBtn.addEventListener('click', () => {
+            textInput.value = '';
+            updateStats();
+        });
+
+        sampleBtn.addEventListener('click', () => {
+            textInput.value = SAMPLE_TEXT;
+            updateStats();
+        });
+
+        updateStats();
+    </script>
+</body>
+</html>

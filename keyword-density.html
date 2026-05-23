@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Free Keyword Density Analyzer - Analyze keyword frequency and density in your text. Perfect for SEO optimization and content analysis.">
+    <meta name="keywords" content="keyword density, keyword frequency, SEO tool, text analyzer, word frequency, content analysis, free online tool">
+    <meta name="author" content="Word Counter Tool">
+    <title>Free Keyword Density Analyzer - Check Keyword Frequency Online</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">📝</span>
+                Word Counter
+            </a>
+            <nav>
+                <a href="index.html" class="nav-link">Word Counter</a>
+                <a href="character-counter.html" class="nav-link">Character Counter</a>
+                <a href="sentence-counter.html" class="nav-link">Sentence Counter</a>
+                <a href="paragraph-counter.html" class="nav-link">Paragraph Counter</a>
+                <a href="keyword-density.html" class="nav-link active">Keyword Density</a>
+            </nav>
+            <button class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Keyword Density Analyzer</h1>
+            <p>Analyze keyword frequency and density for SEO optimization</p>
+        </section>
+
+        <div class="tool-container">
+            <textarea id="textInput" placeholder="Paste or type your text here to analyze keyword density..."></textarea>
+            
+            <div class="button-group">
+                <button class="btn btn-primary" id="copyBtn">📋 Copy</button>
+                <button class="btn btn-secondary" id="clearBtn">🗑️ Clear</button>
+                <button class="btn btn-secondary" id="sampleBtn">📄 Sample</button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalWords">0</div>
+                    <div class="stat-label">Total Words</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="uniqueKeywords">0</div>
+                    <div class="stat-label">Unique Keywords</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stopWordsRemoved">0</div>
+                    <div class="stat-label">Stop Words Removed</div>
+                </div>
+            </div>
+
+            <div class="keywords-section">
+                <h3>📊 Keyword Frequency Table</h3>
+                <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">
+                    Showing keywords with 3+ characters, sorted by frequency. Stop words are excluded.
+                </p>
+                <div id="keywordTable">
+                    <div class="no-results">Enter text to see keyword density analysis</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="privacy-notice">
+            <strong>🔒 Your Privacy Matters:</strong> All text processing happens locally in your browser. 
+            No data is sent to any server. Your text never leaves your device.
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>Tools</h4>
+                <ul>
+                    <li><a href="index.html">Word Counter</a></li>
+                    <li><a href="character-counter.html">Character Counter</a></li>
+                    <li><a href="sentence-counter.html">Sentence Counter</a></li>
+                    <li><a href="paragraph-counter.html">Paragraph Counter</a></li>
+                    <li><a href="keyword-density.html">Keyword Density</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>About</h4>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Contact</h4>
+                <ul>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">Feedback</a></li>
+                    <li><a href="#">Report Bug</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Word Counter Tool. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        const textInput = document.getElementById('textInput');
+        const copyBtn = document.getElementById('copyBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const sampleBtn = document.getElementById('sampleBtn');
+
+        function updateStats() {
+            const text = textInput.value;
+            const trimmed = text.trim();
+            
+            if (!trimmed) {
+                document.getElementById('totalWords').textContent = '0';
+                document.getElementById('uniqueKeywords').textContent = '0';
+                document.getElementById('stopWordsRemoved').textContent = '0';
+                document.getElementById('keywordTable').innerHTML = 
+                    '<div class="no-results">Enter text to see keyword density analysis</div>';
+                return;
+            }
+            
+            const totalWordCount = countWords(text);
+            const keywords = extractKeywords(text, 3);
+            
+            const originalWords = text.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/).filter(w => w.length >= 3);
+            const stopWordsCount = originalWords.filter(w => STOP_WORDS.has(w)).length;
+            
+            document.getElementById('totalWords').textContent = totalWordCount;
+            document.getElementById('uniqueKeywords').textContent = keywords.length;
+            document.getElementById('stopWordsRemoved').textContent = stopWordsCount;
+            
+            updateKeywordTable(keywords);
+        }
+
+        function updateKeywordTable(keywords) {
+            const tableContainer = document.getElementById('keywordTable');
+            
+            if (keywords.length === 0) {
+                tableContainer.innerHTML = '<div class="no-results">No keywords found (minimum 3 characters)</div>';
+                return;
+            }
+            
+            const tableHTML = `
+                <table class="keyword-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Keyword</th>
+                            <th>Frequency</th>
+                            <th>Density</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${keywords.map((kw, index) => `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td><strong>${kw.word}</strong></td>
+                                <td>${kw.count}</td>
+                                <td>${kw.density}%</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            tableContainer.innerHTML = tableHTML;
+        }
+
+        textInput.addEventListener('input', updateStats);
+
+        copyBtn.addEventListener('click', async () => {
+            const success = await copyToClipboard(textInput.value);
+            showCopyFeedback(copyBtn, success);
+        });
+
+        clearBtn.addEventListener('click', () => {
+            textInput.value = '';
+            updateStats();
+        });
+
+        sampleBtn.addEventListener('click', () => {
+            textInput.value = SAMPLE_TEXT;
+            updateStats();
+        });
+
+        updateStats();
+    </script>
+</body>
+</html>
